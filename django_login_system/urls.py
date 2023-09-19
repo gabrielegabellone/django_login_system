@@ -16,14 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from dj_rest_auth.registration.views import VerifyEmailView
+
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+
+@api_view(['GET'])
+def hello_world(request):
+    """This is an endpoint for testing purposes that returns the message 'Hello world!' if the user is authenticated."""
+    return Response({"message": "Hello world!"})
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/v1/dj-rest-auth/', include('dj_rest_auth.urls')),
-    path('api/v1/dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-    # path("verify-email/", VerifyEmailView.as_view(), name="rest_verify_email"),
-    # path("account-confirm-email/", VerifyEmailView.as_view(), name="account_confirm_email_sent"),
-    path("account-confirm-email/<key>/", VerifyEmailView.as_view(), name="account_confirm_email"),
+    path('auth/', include('authentication.urls')),
+    path('hello/', hello_world),
 ]
