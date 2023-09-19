@@ -16,15 +16,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
 from rest_framework.response import Response
+from rest_framework import permissions
 from rest_framework.decorators import api_view
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Django Login System API",
+        default_version='v1',
+    ),
+    public=True,
+    permission_classes=[permissions.AllowAny],
+)
 
 
 @api_view(['GET'])
 def hello_world(request):
-    """This is an endpoint for testing purposes that returns the message 'Hello world!' if the user is authenticated."""
-    return Response({"message": "Hello world!"})
+    """Endpoint for testing purposes that returns the message 'Hello {username}!' if the user is authenticated."""
+    return Response({"message": f"Hello {request.user}!"})
 
 
 urlpatterns = [
@@ -32,4 +43,8 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('auth/', include('authentication.urls')),
     path('hello/', hello_world),
+
+    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger/', schema_view.with_ui(
+        'swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]

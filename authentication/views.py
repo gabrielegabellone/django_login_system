@@ -9,6 +9,10 @@ load_dotenv()
 
 
 class GoogleLogin(SocialLoginView):
+    """Takes care of exchanging the authorization code provided by the Google Server for an access token.
+
+    Returns the token.
+    """
     adapter_class = GoogleOAuth2Adapter
     callback_url = os.environ.get('GOOGLE_LOGIN_CALLBACK_URL')
     client_class = OAuth2Client

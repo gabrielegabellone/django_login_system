@@ -14,3 +14,5 @@ To do this I used the ```dj-rest-auth``` and ```allauth``` packages.
 ```python manage.py migrate```
 - run the app  
 ```python manage.py runserver```
+## API Documentation
+To see the API documentation with swagger UI and test the API go to http://localhost:8000/swagger, or you can go to http://localhost:8000/swagger.json to see it in json format.
