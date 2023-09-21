@@ -15,10 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from rest_framework.response import Response
+from django.urls import path, include, re_path
 from rest_framework import permissions
-from rest_framework.decorators import api_view
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
@@ -32,17 +30,11 @@ schema_view = get_schema_view(
 )
 
 
-@api_view(['GET'])
-def hello_world(request):
-    """Endpoint for testing purposes that returns the message 'Hello {username}!' if the user is authenticated."""
-    return Response({"message": f"Hello {request.user}!"})
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('auth/', include('authentication.urls')),
-    path('hello/', hello_world),
+    re_path(r'^', include('django.contrib.auth.urls')),  # needed for rest_password_reset view
 
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui(
