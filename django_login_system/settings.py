@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'allauth',
     'allauth.account',
     'dj_rest_auth',
@@ -60,6 +61,7 @@ SITE_ID = 1
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -67,6 +69,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
+
+# specify which domains you want to give access
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8000',
+)
 
 ROOT_URLCONF = 'django_login_system.urls'
 
