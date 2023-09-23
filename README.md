@@ -16,3 +16,27 @@ To do this I used the ```dj-rest-auth``` and ```allauth``` packages.
 ```python manage.py runserver```
 ## API Documentation
 To see the API documentation with swagger UI and test the API go to http://localhost:8000/swagger, or you can go to http://localhost:8000/swagger.json to see it in json format.
+## Google Authentication
+How do I authenticate a Google account?  
+1. I go to ```https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=<GOOGLE_LOGIN_CALLBACK_URL>&prompt=consent&response_type=code&client_id=<YOUR CLIENT ID>&scope=openid%20email%20profile&access_type=offline``` and choose the account with which I want to authenticate.
+Next you will be redirected to this page:
+<img width="500" alt="Screenshot 2023-09-23 171939" src="https://github.com/gabrielegabellone/django_login_system/assets/115152050/1d0e5d95-e9af-4f54-a534-cdaa41bd8b7f">   
+
+
+2. Then you can get manually the code provided in the URL and POST it to the Google Login enpoint:  
+```curl -X POST http://localhost:8000/dj-rest-auth/google/ -H 'Content-type: application/json' -d '{"code":"<your_authorization_code>"}'```
+
+3. Now a new user will be created in the database and you will get a token that you can use to make authorized requests:  
+Request: ```curl http://localhost:8000/auth/hello/ -H 'Authorization: Token <your_token>'```  
+Response: ```{"message":"Hello <username>!"}```
+## Problems Encountered
+### Failed to exchange code for access token
+The first times I tried to authenticate with Google, I had problems getting the token through the code. I received this response: ```{"non_field_errors":"Failed to exchange code for access token"}```.  
+While debugging I discovered that the cause was the following exception:  ```Error retrieving access token: b'{\n  "error": "invalid_grant",\n  "error_description": "Malformed auth code."\n}'```.  
+So basically it was an authorization code decoding problem, where the `%2F` had to be encoded in `/`. So I identified 2 possible solutions:
+- manually replace the ```%2F``` in ```/``` of the authorization code when you make the POST request;
+- add a control directly into the library, then go to ```venv/Lib/site-packages/dj_rest_auth/registration/serializers.py``` and add this code block to line 134 (before the try-except block for getting the token):  
+```python
+if '%2F' in code:
+    code = code.replace('%2F', '/')
+```
