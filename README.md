@@ -28,7 +28,7 @@ Create a .env file and set the following variables:
 To see the API documentation with swagger UI and test the API go to http://localhost:8000/swagger, or you can go to http://localhost:8000/swagger.json to see it in json format.
 ## Google Authentication
 How do I authenticate a Google account?  
-1. Go to ```https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=<GOOGLE_LOGIN_CALLBACK_URL>&prompt=consent&response_type=code&client_id=<YOUR CLIENT ID>&scope=openid%20email%20profile&access_type=offline``` and choose the account with which I want to authenticate.
+1. Go to ```https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=<GOOGLE_LOGIN_CALLBACK_URL>&prompt=consent&response_type=code&client_id=<YOUR CLIENT ID>&scope=openid%20email%20profile&access_type=offline``` and choose the account with which you want to authenticate.
 Next, you will be redirected to this page:
 <img width="500" alt="Screenshot 2023-09-23 171939" src="https://github.com/gabrielegabellone/django_login_system/assets/115152050/1d0e5d95-e9af-4f54-a534-cdaa41bd8b7f">   
 
