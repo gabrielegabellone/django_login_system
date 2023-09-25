@@ -1,4 +1,5 @@
 # Django Login System
+![Coverage Badge](./reports/coverage-badge.svg)  
 Project with the aim of learning how to implement an authentication system with Django Rest Framework.  
 The project is structured in one app, **authentication**, which contains the authentication logics.  
 The idea is to be able to authenticate a user via username and password provided during registration or via OAuth authentication (currently, only with Google).
