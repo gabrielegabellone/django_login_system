@@ -26,12 +26,12 @@ jobs:
         coverage run manage.py test
         coverage xml -o ./reports/coverage/coverage.xml
         genbadge coverage -o ./reports/coverage-badge.svg
+        
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     - name: Print coverage report
       run: coverage report -m
-
-      env:
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     - name: Commit to update the badge
       run: |
