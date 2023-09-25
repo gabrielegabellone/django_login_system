@@ -1,6 +1,7 @@
 from django.test import TestCase, override_settings
 from django.core import mail
 from django.contrib.auth.models import User, AnonymousUser
+from allauth.socialaccount.models import SocialAccount
 from rest_framework.test import APIClient
 
 
@@ -134,13 +135,27 @@ class AuthenticationViewsTest(TestCase):
         self.assertEqual(expected_data, actual_data)
         self.assertEqual(200, response.status_code)
 
-    def test_hello_world(self):
+    def test_hello(self):
         """Tests the correct functioning of the hello endpoint."""
         self.client.force_authenticate(user=self.user)
         response = self.client.get('/auth/hello/')
 
         actual_data = response.content
         expected_data = b'{"message":"Hello user!"}'
+
+        self.assertEqual(expected_data, actual_data)
+        self.assertEqual(200, response.status_code)
+
+    def test_google_login(self):
+        """Tests the correct functioning of the hello endpoint with a user authenticated with Google."""
+        User.objects.create_user(username='testgmailuser')
+        gmail_user = User.objects.get(username='testgmailuser')
+        SocialAccount.objects.create(user=gmail_user, provider='Google', uid='1234567890')
+        self.client.force_authenticate(user=gmail_user)
+
+        response = self.client.get('/auth/hello/')
+        actual_data = response.content
+        expected_data = b'{"message":"Hello testgmailuser!"}'
 
         self.assertEqual(expected_data, actual_data)
         self.assertEqual(200, response.status_code)
