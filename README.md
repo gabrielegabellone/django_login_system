@@ -25,6 +25,12 @@ Create a .env file and set the following variables:
 ```docker-compose up```
 - run migrations  
 ```docker-compose run web python manage.py migrate```
+## How to run with security settings
+Another goal I set myself is to make the software safe, as if it were in production, therefore setting specific settings for a production environment, so I also created a specific docker-compose.
+- To run the app with security settings:  
+```docker-compose -f docker-compose-prod.yml up -d --build ```
+- Check if the project is ready to be deployed  
+``` docker-compose exec web python manage.py check --deploy```
 ## API Documentation
 To see the API documentation with swagger UI and test the API go to http://localhost:8000/swagger, or you can go to http://localhost:8000/swagger.json to see it in json format.
 ## Google Authentication
@@ -40,14 +46,21 @@ Next, you will be redirected to this page:
 3. Now a new user will be created in the database and you will get a token that you can use to make authorized requests:  
 Request: ```curl http://localhost:8000/auth/hello/ -H 'Authorization: Token <your_token>'```  
 Response: ```{"message":"Hello <username>!"}```
-## Problems Encountered
-### Failed to exchange code for access token
-The first times I tried to authenticate with Google, I had problems getting the token through the code. I received this response: ```{"non_field_errors":"Failed to exchange code for access token"}```.  
-While debugging I discovered that the cause was the following exception:  ```Error retrieving access token: b'{\n  "error": "invalid_grant",\n  "error_description": "Malformed auth code."\n}'```.  
-So basically it was an authorization code decoding problem, where the `%2F` had to be encoded in `/`. So I identified 2 possible solutions:
-- manually replace the ```%2F``` in ```/``` of the authorization code when you make the POST request;
-- add a control directly into the library, then go to ```venv/Lib/site-packages/dj_rest_auth/registration/serializers.py``` and add this code block to line 134 (before the try-except block for getting the token):  
+## Resolve "Failed to exchange code for access token"
+When authenticating with Google, if you POST the code to get the token and get this error message: ```{"non_field_errors":"Failed to exchange code for access token"}```, it's probably because the code received was not decoded, to fix this, I made some changes in the library:
+1. go to ```venv/Lib/site-packages/dj_rest_auth/registration/serializers.py```
+2. import urlib.parse at the top
 ```python
-if '%2F' in code:
-    code = code.replace('%2F', '/')
+import urllib.parse
+```
+3. add this line of code in the validate method of the SocialLoginSerializer class, before the try-except block for getting the token:  
+```python
+code = urllib.parse.unquote(code) # add this
+
+try:
+    token = client.get_access_token(code)
+except OAuth2Error as ex:
+    raise serializers.ValidationError(
+        _('Failed to exchange code for access token')
+    ) from ex
 ```
